@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/rudrata/static/css/main.946f88f0.chunk.css",
+    "main.js": "/rudrata/static/js/main.1671ab2a.chunk.js",
+    "main.js.map": "/rudrata/static/js/main.1671ab2a.chunk.js.map",
+    "runtime-main.js": "/rudrata/static/js/runtime-main.21fc6e25.js",
+    "runtime-main.js.map": "/rudrata/static/js/runtime-main.21fc6e25.js.map",
+    "static/css/2.dfa730b3.chunk.css": "/rudrata/static/css/2.dfa730b3.chunk.css",
+    "static/js/2.cef98e45.chunk.js": "/rudrata/static/js/2.cef98e45.chunk.js",
+    "static/js/2.cef98e45.chunk.js.map": "/rudrata/static/js/2.cef98e45.chunk.js.map",
+    "static/js/3.a6115070.chunk.js": "/rudrata/static/js/3.a6115070.chunk.js",
+    "static/js/3.a6115070.chunk.js.map": "/rudrata/static/js/3.a6115070.chunk.js.map",
+    "index.html": "/rudrata/index.html",
+    "static/css/2.dfa730b3.chunk.css.map": "/rudrata/static/css/2.dfa730b3.chunk.css.map",
+    "static/css/main.946f88f0.chunk.css.map": "/rudrata/static/css/main.946f88f0.chunk.css.map",
+    "static/js/2.cef98e45.chunk.js.LICENSE.txt": "/rudrata/static/js/2.cef98e45.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.21fc6e25.js",
+    "static/css/2.dfa730b3.chunk.css",
+    "static/js/2.cef98e45.chunk.js",
+    "static/css/main.946f88f0.chunk.css",
+    "static/js/main.1671ab2a.chunk.js"
+  ]
+}
