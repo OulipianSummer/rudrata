@@ -1,16 +1,28 @@
 # Rudrata
 
-Rudrata is a web-based puzzle that challenges users to visit every square on an a chess board using only a knight!
+Rudrata is a react based puzzle that challenges users to visit every square on an a chess board using only a knight!
 
 Players may select their preferred level of difficulty by changing the size of the chess board.
 
 ![screenshot](https://github.com/OulipianSummer/rudrata/blob/master/screenshot.png)
 
-## How To Use
+
+## Play Now
+LIVE DEMO: Hosted On [GithubPages](https://oulipiansummer.github.io/rudrata/)
+
+Rudrata has been deployed for testing to Github Pages, but in a future update, expect to see Rudrata on its own website!
+
+
+## How To Use This App
 
 This application was built using create react app. If you are interested in testing it out, download the repository, navigate to the ```/rudrata``` directory, and execute
 
+    npm install
     npm start
+
+There are some simple smoke tests also built into the app using create-react-app's default Jest testing suite, which can be run by using
+
+    npm run test
 
 
 ## Changelog
