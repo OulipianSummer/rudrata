@@ -17,4 +17,5 @@ This application was built using create react app. If you are interested in test
 
 Version | Info
 ----------|-----------
-1.0  | First version includes an interactive chessboard, a simple score box, and some information about how to play.
+0.1.0  | First version includes an interactive chessboard, a simple score box, and some information about how to play.
+0.1.1  | Fixed visual bug on dragging and during regular click events. Added quick fix for background colors in phones that prefer dark mode.

@@ -12,6 +12,12 @@ it('renders the app name and subtext', () => {
   expect(screen.getByText('Visit each square on the chess board!')).toBeInTheDocument();
 });
 
+it('renders an 8x8 chessboard by default', () => {
+  render(<App />);
+  expect(screen.getAllByTestId('chess_board_square')).toHaveLength(64);
+});
+
+
 it('renders the new game and difficulty buttons', () => {
   render(<App />);
   expect(screen.getByText('New Game')).toBeInTheDocument();
