@@ -1,10 +1,12 @@
-import React, { Component, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import "bootswatch/dist/flatly/bootstrap.min.css";
 import HowTo from "./components/HowTo/HowTo.js";
 import Score from "./components/Score/Socre.js";
 import CreatedBy from "./components/CreatedBy/CreatedBy.js";
 import Win from "./components/Win/Win.js";
 
+
+// Standard import for custom css
 import "./App.css";
 
 // React-bootstrap import
@@ -24,46 +26,13 @@ import Chessdiagram from "./components/rudrata-chess-diagram/chessdiagram";
 import Measure from "react-measure";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faPiggyBank } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faPiggyBank, faCode } from "@fortawesome/free-solid-svg-icons";
 
-class App extends Component {
+export default class App extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       order: 8,
-    };
-
-    this.handleOrder = this.handleOrder.bind(this);
-  }
-
-  handleOrder(event) {
-    const order = parseInt(event.target.attributes["data-order"].value);
-
-    return this.setState({ order: order });
-  }
-
-  render() {
-    return (
-      <React.Fragment>
-        <Row>
-          <Col col={12}>
-            <ChessBoard
-              handleOrder={this.handleOrder}
-              order={this.state.order}
-            />
-          </Col>
-        </Row>
-      </React.Fragment>
-    );
-  }
-}
-
-class ChessBoard extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      boardWidth: parseInt(props.order),
-      boardHeight: parseInt(props.order),
       diagramDimensions: { width: -1 },
       seqNumber: 0,
       tourSeq: [],
@@ -71,49 +40,57 @@ class ChessBoard extends PureComponent {
       currentScore: 0,
     };
 
-    this.wrapper = React.createRef();
-
     this.handleClear = this.handleClear.bind(this);
     this.handleMove = this.handleMove.bind(this);
     this.handleHowTo = this.handleHowTo.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
-    // Typical usage (don't forget to compare props):
-    if (this.props.order !== prevProps.order) {
-      return this.setState({
-        boardHeight: this.props.order,
-        boardWidth: this.props.order,
-      });
-    }
-  }
-
+  // Processes incoming moves ("e4", "a5", "b8", etc.) and decides whether or not users are allowed to move the knight to them
   handleMove(move) {
     const { tourSeq } = this.state;
 
+    // Checks to see if the tour has already visited this square
     if (tourSeq.includes(move) === false) {
+      
+      //Checks to see if the tour hasn't even begun yet
       if (this.state.seqNumber === 0) {
+        
+        //First moves are simply placed where the user clicks
         return this.placeKnight(move);
       } else {
+        
+        // If we have gotten to here, that means that there must be at least one move in the sequence, so we assign it to this constant
         const prevMove = tourSeq.slice().pop();
 
+        // Both the current move and the previous move is fed in to the checkLegalMove method which returns true or false
         if (this.checkLegalMove(move, prevMove) === true) {
+         
+          // Legal moves are executed
           return this.placeKnight(move);
         } else {
+          
+          // Illegal moves are simply ignored
           return null;
         }
       }
     }
   }
 
+  // The how to section has a simple method for handling changing its className to trigger a short CSS transition when a user clicks the how to link
+  // This method also has a scrollIntoView call that brings users down to the how to information
   handleHowTo() {
+    
+    // Shows the users the how to information when clicked
     const howto = document.querySelector("#how-to");
     howto.scrollIntoView();
 
+    // When set to true, helpAltBackground will change some className information on the how to component, which triggers a CSS animation
     this.setState((state) => ({
       helpAltBackground: !state.helpAltBackground,
     }));
+
+    // After 5 seconds, the state is witched back to false.
     return setTimeout(() => {
       this.setState((state) => ({
         helpAltBackground: !state.helpAltBackground,
@@ -121,6 +98,7 @@ class ChessBoard extends PureComponent {
     }, 5000);
   }
 
+  // This function iterates through all of the possible moves a knight can take and attempts to figure out if the requested move is possible
   checkLegalMove(move, prevMove) {
     const legalMoves = [
       [2, 1],
@@ -134,22 +112,29 @@ class ChessBoard extends PureComponent {
     ];
     const ranks = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
 
-    const re = /(\d{1,})/;
+    // This regular expression is built to find the files (numbers) of the moves passed into this function
+    const files_re = /(\d{1,})/;
 
+    // Declares a block of variables used for storing the various ranks and files of each move being processed
     const move_x = ranks.indexOf(move[0]) + 1;
-    const move_y = parseInt(move.split(re)[1]);
+    const move_y = parseInt(move.split(files_re)[1]);
     const prevMove_x = ranks.indexOf(prevMove[0]) + 1;
-    const prevMove_y = parseInt(prevMove.split(re)[1]);
+    const prevMove_y = parseInt(prevMove.split(files_re)[1]);
+    
+    // A temporary boolean that is set to false, but will be switched to true if the move requested is legal.
     let isLegal = false;
 
+    // Loops through all of the possible moves the knight can take and decides whether or not the requested move is possible
+    // Operates in linear time in a worse case scenario (the user clicks on a spot that is impossible to move to), but will break early if a legal move is found.
     for (let i in legalMoves) {
+      
       if (
         prevMove_x + legalMoves[i][0] === move_x &&
         prevMove_y + legalMoves[i][1] === move_y
       ) {
-        isLegal = true;
-
-        return isLegal;
+        
+        // Breaks the loop as soon as a move is found
+        return isLegal = true;
       } else {
         continue;
       }
@@ -158,6 +143,7 @@ class ChessBoard extends PureComponent {
     return isLegal;
   }
 
+  // A simple method for appending the knight's position to an array held in the state, thus updating the chess board and what it displays
   placeKnight(move) {
     let sequence = this.state.tourSeq.slice();
     sequence.push(move);
@@ -168,45 +154,53 @@ class ChessBoard extends PureComponent {
     }));
   }
 
+
+  // Resets the entire chess board using setState
   handleClear() {
     return this.setState({ tourSeq: [], seqNumber: 0, currentScore: 0 });
   }
 
+  // This method is called each time the user changes the chess board size
+  // Method clears the chess board, and take the incomming event data and processes it to find out the new chess board size
   handleUpdate(event) {
     this.handleClear();
-    this.props.handleOrder(event);
+    const order = event.target.attributes['data-order'].value;
+
+    return this.setState({order: order});
+    
   }
 
   render() {
     const {
-      boardWidth,
-      boardHeight,
+      order,
       diagramDimensions,
       seqNumber,
       tourSeq,
       currentScore,
     } = this.state;
 
-    let tourSquares = tourSeq; //sequence of squares visited in tour (as array)
-    let lastSquareName = tourSquares[seqNumber - 1];
-
-    let positionDescriptor = tourSquares.map((sq) => "-@" + sq); // blanked squares at each square of sequence
-    if (lastSquareName) positionDescriptor.push("N@" + lastSquareName); // knight on last square of sequence
+  
+    // This code block is used to build the positionDescriptor, a simple array containing the position of all of the blanked squares, and the knight.
+    let lastSquareName = tourSeq[seqNumber - 1];
+    let positionDescriptor = tourSeq.map((sq) => "-@" + sq);
+    if (lastSquareName) positionDescriptor.push("N@" + lastSquareName); 
 
     return (
       <React.Fragment>
+        <Row>
+          <Col col={12}>
         {/* A win condition that displays a fun visual effect */}
-        {seqNumber === this.props.order * this.props.order && <Win />}
+        {seqNumber === Math.pow(order, 2) && <Win />}
 
         {/* The website header */}
         <header id="rudrata-header">
           <Container fluid className="d-flex justify-content-around mb-5">
             <Row>
               <Col className="mr-5">
-                <h1 className="display-2">Rudrata</h1>
-                <p>Visit each square on the chess board!</p>
+                <h1 className="display-2 text-center">Rudrata</h1>
+                <p className='text-center'>Visit each square on the chess board!</p>
                 <button
-                  className="font-weight-bold btn-link btn"
+                  className=" font-weight-bold btn-link btn mb-2 mt-2"
                   onClick={this.handleHowTo}
                 >
                   How To Play <FontAwesomeIcon icon={faArrowRight} />
@@ -214,15 +208,17 @@ class ChessBoard extends PureComponent {
               </Col>
 
               <Col>
+              {/* A simple score keeping component  */}
                 <Row>
-                  <Score currentScore={currentScore} order={this.props.order} />
+                  <Score currentScore={currentScore} order={order} />
                 </Row>
 
-                <ButtonToolbar className="d-flex w-75 flex-column justify-content-around ml-3">
+                <ButtonToolbar className="d-flex col-12 flex-column justify-content-around">
                   <Row>
+                    {/* New game button */}
                     <Button
                       size="lg"
-                      className="mt-2"
+                      className="mt-3 btn-block"
                       variant="success"
                       onClick={this.handleClear}
                     >
@@ -231,8 +227,9 @@ class ChessBoard extends PureComponent {
                   </Row>
 
                   <Row>
-                    <Dropdown className="mt-2 w-100">
-                      <Dropdown.Toggle size="lg" variant="success">
+                    {/* A dropdown that allows users to choose their preferred difficulty */}
+                    <Dropdown block='true' className="mt-3 btn-block w-100">
+                      <Dropdown.Toggle block='true' size="lg" variant="success">
                         Chess Board Size
                       </Dropdown.Toggle>
 
@@ -302,6 +299,7 @@ class ChessBoard extends PureComponent {
           </Container>
         </header>
 
+        {/* This section contains the chess board object */}
         <section id="chessboard">
           <Measure
             bounds
@@ -315,11 +313,11 @@ class ChessBoard extends PureComponent {
                   allowMoves={false}
                   squareSize={
                     measureRef
-                      ? Math.min(80, (1 * diagramDimensions.width) / boardWidth)
+                      ? Math.min(80, (1 * diagramDimensions.width) / order)
                       : 45
                   }
-                  files={boardHeight}
-                  ranks={boardWidth}
+                  files={parseInt(order)}
+                  ranks={parseInt(order)}
                   pieces={positionDescriptor}
                   onSelectSquare={(name) => this.handleMove(name)}
                   lightSquareColor="#F0EBD8"
@@ -331,21 +329,27 @@ class ChessBoard extends PureComponent {
         </section>
         <br />
 
+
+        {/* How To section */}
         <section id="how-to-section">
           <HowTo altBackground={this.state.helpAltBackground} />
         </section>
         <hr className="w-50" />
 
+
+        {/* Created By Information */}          
         <section id="created-by-section">
           <CreatedBy />
         </section>
 
+       {/* This section contains some links out of website back to the project's GitHub page and a donation link */}
         <section
-          id="donate-section"
+          id="button-section"
           className="d-flex flex-row justify-content-center"
         >
+          <ButtonToolbar role='navigation'>
           <a
-            className="btn btn-primary btn-lg"
+            className="btn btn-primary btn-lg mr-1"
             href="https://www.paypal.com/donate?hosted_button_id=3972H6RJEYDVW"
             target="_blank"
             rel="noreferrer"
@@ -353,8 +357,19 @@ class ChessBoard extends PureComponent {
             <FontAwesomeIcon className="mr-2" icon={faPiggyBank} />
             Donate
           </a>
+
+          <a
+          className='btn btn-primary btn-lg ml-1'
+          href='https://github.com/OulipianSummer/rudrata'
+          target='_blank'
+          rel='noreferrer'
+          ><FontAwesomeIcon icon={faCode}/> View On GitHub</a>
+          </ButtonToolbar>
+
         </section>
         <hr className="w-50" />
+
+        {/* This section contains a simple privacy policy that simply states that this app can't track users or store user data. */}
         <section id="tos" className="d-flex flex-row justify-content-center">
           <p>
             Rudrata does not store or process any personal data, period. It
@@ -371,9 +386,9 @@ class ChessBoard extends PureComponent {
             .
           </p>
         </section>
+        </Col>
+        </Row>
       </React.Fragment>
     );
   }
 }
-
-export default App;

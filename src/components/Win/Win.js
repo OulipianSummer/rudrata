@@ -3,12 +3,12 @@ import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from 'react-confetti'
  
 export default function Win(){
-  const { width, height } = useWindowSize()
+  const { width } = useWindowSize();
   return (
     <Confetti
       className='confetti'
       width={width}
-      height={height}
+      height={document.body.clientHeight}
     />
   )
 }

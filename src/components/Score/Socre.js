@@ -8,7 +8,7 @@ export default function Score(props){
             
                 <Col className='font-weight-bold rounded d-flex flex-column pb-2 bg-success'> 
                 <p className='text-light text-center'>Score</p>
-                <Badge variant='success' className='font-weight-bold'>{props.currentScore}/{props.order * props.order}</Badge>
+                <Badge variant='success' className='font-weight-bold'>{props.currentScore}/{Math.pow(props.order, 2)}</Badge>
                 </Col>   
              
             </div>

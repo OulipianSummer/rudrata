@@ -30,8 +30,6 @@ body {
 
 .confetti {
   margin-top: -50px;
-  position: sticky;
-  height: 100%;
 }
 
 /* Quick fix for the background on phones using dark mode */
