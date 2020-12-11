@@ -27,9 +27,9 @@ There are some simple smoke tests also built into the app using create-react-app
 
 ### Technologies
 
-React
-React-Bootstrap
-GitHub Pages
+ - React
+ - React-Bootstrap
+ - GitHub Pages
 
 ## Changelog
 
