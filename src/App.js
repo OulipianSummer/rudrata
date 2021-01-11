@@ -10,9 +10,6 @@ import Win from "./components/Win/Win.js";
 // Standard import for custom css
 import "./App.css";
 
-//import animate.css module
-import 'animate.css'
-
 // React-bootstrap import
 import {
   Button,
