@@ -38,3 +38,4 @@ Version | Info
 0.1.0  | First version includes an interactive chessboard, a simple score box, and some information about how to play.
 0.1.1  | Fixed visual bug on dragging and during regular click events. Added quick fix for background colors in phones that prefer dark mode.
 0.1.2  | Fixed CSS bug where confetti would be too wide on mobile screens, made buttons and header more mobile-size friendly, rebased code to make it easier to maintain, added more comments to code, removed some unused files and code from /src
+0.1.3  | Added an end of game event for when the player has made a move that has no exit! As an added bonus, rudrata now also generates a list of legal moves after each new move is requested.

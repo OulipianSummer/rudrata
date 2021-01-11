@@ -2,12 +2,16 @@ import React, { PureComponent } from "react";
 import "bootswatch/dist/flatly/bootstrap.min.css";
 import HowTo from "./components/HowTo/HowTo.js";
 import Score from "./components/Score/Socre.js";
+import GameOver from "./components/GameOver/GameOver.js";
 import CreatedBy from "./components/CreatedBy/CreatedBy.js";
 import Win from "./components/Win/Win.js";
 
 
 // Standard import for custom css
 import "./App.css";
+
+//import animate.css module
+import 'animate.css'
 
 // React-bootstrap import
 import {
@@ -36,6 +40,8 @@ export default class App extends PureComponent {
       diagramDimensions: { width: -1 },
       seqNumber: 0,
       tourSeq: [],
+      legalSquares: [],
+      gameOver: false,
       helpAltBackground: false,
       currentScore: 0,
     };
@@ -48,32 +54,35 @@ export default class App extends PureComponent {
 
   // Processes incoming moves ("e4", "a5", "b8", etc.) and decides whether or not users are allowed to move the knight to them
   handleMove(move) {
-    const { tourSeq } = this.state;
+    const { tourSeq, legalSquares, gameOver } = this.state;
 
-    // Checks to see if the tour has already visited this square
-    if (tourSeq.includes(move) === false) {
+    // If the first move has not yet been made, this branch simply places the knight on the board and generates an array of legalSquares the player can move to.
+    if ( tourSeq.length === 0){
+      const newLegalSquares = this.checkLegalMove(move, tourSeq);
       
-      //Checks to see if the tour hasn't even begun yet
-      if (this.state.seqNumber === 0) {
-        
-        //First moves are simply placed where the user clicks
-        return this.placeKnight(move);
-      } else {
-        
-        // If we have gotten to here, that means that there must be at least one move in the sequence, so we assign it to this constant
-        const prevMove = tourSeq.slice().pop();
+      console.log(legalSquares);
+      
+      this.setState({legalSquares: newLegalSquares});
+      return this.placeKnight(move);
 
-        // Both the current move and the previous move is fed in to the checkLegalMove method which returns true or false
-        if (this.checkLegalMove(move, prevMove) === true) {
-         
-          // Legal moves are executed
-          return this.placeKnight(move);
-        } else {
-          
-          // Illegal moves are simply ignored
-          return null;
-        }
+      // This branch is activated if any moves have been made.
+    } else {
+      
+      // Checks to see if the move requested is in the array that was created during the previous move
+      if (!gameOver && legalSquares.includes(move)){
+        
+        const newLegalSquares = this.checkLegalMove(move, tourSeq);
+        
+        console.log(legalSquares, move);
+        
+        this.setState({legalSquares: newLegalSquares});
+        return this.placeKnight(move);
+        
+        // Moves that are not found in the legalSquares array are simply ignored 
+      } else {
+        return undefined;
       }
+    
     }
   }
 
@@ -99,7 +108,16 @@ export default class App extends PureComponent {
   }
 
   // This function iterates through all of the possible moves a knight can take and attempts to figure out if the requested move is possible
-  checkLegalMove(move, prevMove) {
+  checkLegalMove(move, tourSeq) {
+
+    const { order, seqNumber } = this.state;
+  
+    // Check to see if the move has already been made. If so, exit early.
+    if (tourSeq.includes(move)){
+      return [];
+    }
+    
+    // A 2d array of all of the possible moves a knight can make. Used to generated square names.
     const legalMoves = [
       [2, 1],
       [2, -1],
@@ -118,33 +136,39 @@ export default class App extends PureComponent {
     // Declares a block of variables used for storing the various ranks and files of each move being processed
     const move_x = ranks.indexOf(move[0]) + 1;
     const move_y = parseInt(move.split(files_re)[1]);
-    const prevMove_x = ranks.indexOf(prevMove[0]) + 1;
-    const prevMove_y = parseInt(prevMove.split(files_re)[1]);
+
+    const legalSquares = legalMoves.map(function(legal){
+      const next_x = legal[0] + move_x;
+      const next_y = legal[1] + move_y;
+      const next= `${ranks[next_x - 1]}${next_y}`;
     
-    // A temporary boolean that is set to false, but will be switched to true if the move requested is legal.
-    let isLegal = false;
+      if(next_x > 0 && next_x <= order &&
+         next_y > 0 && next_y <= order &&
+        tourSeq.includes(next) === false){
+          return next;
+        } else {
+          return null;
+        }
+    
+    });
+    
+  let filteredSquares = legalSquares.filter(ele => ele !== null);
+  
+  // As a final check, we make sure that the final result has at least one move left in it. If it does not, then the game is over!
+  if (filteredSquares.length === 0 && seqNumber < order * order){
+    this.gameOver();
+    return [];
+  } else {return filteredSquares}
+   
+  }
 
-    // Loops through all of the possible moves the knight can take and decides whether or not the requested move is possible
-    // Operates in linear time in a worse case scenario (the user clicks on a spot that is impossible to move to), but will break early if a legal move is found.
-    for (let i in legalMoves) {
-      
-      if (
-        prevMove_x + legalMoves[i][0] === move_x &&
-        prevMove_y + legalMoves[i][1] === move_y
-      ) {
-        
-        // Breaks the loop as soon as a move is found
-        return isLegal = true;
-      } else {
-        continue;
-      }
-    }
-
-    return isLegal;
+  gameOver(){
+    return this.setState({gameOver: true});
   }
 
   // A simple method for appending the knight's position to an array held in the state, thus updating the chess board and what it displays
   placeKnight(move) {
+
     let sequence = this.state.tourSeq.slice();
     sequence.push(move);
     return this.setState((state) => ({
@@ -157,7 +181,7 @@ export default class App extends PureComponent {
 
   // Resets the entire chess board using setState
   handleClear() {
-    return this.setState({ tourSeq: [], seqNumber: 0, currentScore: 0 });
+    return this.setState({ tourSeq: [], seqNumber: 0, currentScore: 0, legalSquares: [], gameOver: false});
   }
 
   // This method is called each time the user changes the chess board size
@@ -176,6 +200,7 @@ export default class App extends PureComponent {
       diagramDimensions,
       seqNumber,
       tourSeq,
+      gameOver,
       currentScore,
     } = this.state;
 
@@ -301,6 +326,7 @@ export default class App extends PureComponent {
 
         {/* This section contains the chess board object */}
         <section id="chessboard">
+         
           <Measure
             bounds
             onResize={(contentRect) => {
@@ -309,6 +335,7 @@ export default class App extends PureComponent {
           >
             {({ measureRef }) => (
               <div ref={measureRef} className="d-flex justify-content-center">
+                 {gameOver === true && <GameOver score={`${seqNumber} / ${order * order}`} newGame ={this.handleClear}/>}
                 <Chessdiagram
                   allowMoves={false}
                   squareSize={
