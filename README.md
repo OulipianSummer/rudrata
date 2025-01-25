@@ -1,5 +1,7 @@
 # Rudrata
 
+Migrated to: [https://codeberg.org/amb/rudrata](https://codeberg.org/amb/rudrata)
+
 Rudrata is a react based puzzle that challenges users to visit every square on an a chess board using only a knight!
 
 Players may select their preferred level of difficulty by changing the size of the chess board.
